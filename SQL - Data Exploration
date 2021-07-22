@@ -1,0 +1,88 @@
+select * from Portfolio_Data..['������ 1$']
+
+-- extract relevant info from both tables
+
+select ['������ 1$'].Age, 
+['������ 1$'].Education, 
+['������ 1$'].Incomes, 
+['����� �����$'].[Read any printed books during last 12months?] ,
+['����� �����$'].[Read any e-books during last 12months?],
+['����� �����$'].[Read any audiobooks during last 12months?]
+from Portfolio_Data..['����� �����$'] 
+join Portfolio_Data..['������ 1$'] on ['������ 1$'].[Serial Number]=['����� �����$'].[Serial Number] 
+order by ['������ 1$'].Incomes
+
+
+-- filter readers only => Participants must read at least 1 book of any format
+select * 
+from Portfolio_Data..['����� �����$'] 
+join Portfolio_Data..['������ 1$'] on ['������ 1$'].[Serial Number]=['����� �����$'].[Serial Number] 
+where (['����� �����$'].[Read any printed books during last 12months?] !='NULL' 
+and ['����� �����$'].[Read any e-books during last 12months?]!='NULL'
+and ['����� �����$'].[Read any audiobooks during last 12months?]!='NULL'
+and ['����� �����$'].[Read any printed books during last 12months?] !='No' 
+or ['����� �����$'].[Read any e-books during last 12months?]!='No'
+or ['����� �����$'].[Read any audiobooks during last 12months?]!='No'
+)
+
+-- explore data about reading formats
+
+select (Count(case when ['����� �����$'].[Read any printed books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any e-books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any audiobooks during last 12months?]='Yes' then 1 end)) as 'Overall Readings',
+Count(case when ['����� �����$'].[Read any printed books during last 12months?]='Yes' then 1 end) as 'Printed book readers',
+Count(case when ['����� �����$'].[Read any e-books during last 12months?]='Yes' then 1 end) as 'E-book readers',
+Count(case when ['����� �����$'].[Read any audiobooks during last 12months?]='Yes' then 1 end) as 'Audio book readers',
+
+((Count(case when ['����� �����$'].[Read any printed books during last 12months?]='Yes' then 1 end)*100)/
+(Count(case when ['����� �����$'].[Read any printed books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any e-books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any audiobooks during last 12months?]='Yes' then 1 end))) as 'Printed books Percentage',
+
+((Count(case when ['����� �����$'].[Read any audiobooks during last 12months?]='Yes' then 1 end)*100)/
+(Count(case when ['����� �����$'].[Read any printed books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any e-books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any audiobooks during last 12months?]='Yes' then 1 end))) as 'Audio books Percentage',
+
+((Count(case when ['����� �����$'].[Read any e-books during last 12months?]='Yes' then 1 end)*100)/
+(Count(case when ['����� �����$'].[Read any printed books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any e-books during last 12months?]='Yes' then 1 end)+
+Count(case when ['����� �����$'].[Read any audiobooks during last 12months?]='Yes' then 1 end))) as 'E-books Percentage'
+
+from Portfolio_Data..['����� �����$'] 
+join Portfolio_Data..['������ 1$'] on ['������ 1$'].[Serial Number]=['����� �����$'].[Serial Number] 
+where (['����� �����$'].[Read any printed books during last 12months?] !='NULL' 
+and ['����� �����$'].[Read any e-books during last 12months?]!='NULL'
+and ['����� �����$'].[Read any audiobooks during last 12months?]!='NULL'
+and ['����� �����$'].[Read any printed books during last 12months?] !='No' 
+or ['����� �����$'].[Read any e-books during last 12months?]!='No'
+or ['����� �����$'].[Read any audiobooks during last 12months?]!='No'
+)
+
+--explore data about readers profiles
+select count(Sex) as 'Overall Active Readers',
+(COUNT (case when ['������ 1$'].Sex='Male'then 1 end)*100/count(Sex)) as 'Male Readers Percentage',
+(COUNT (case when ['������ 1$'].Sex='Female'then 1 end)*100/count(Sex)) as 'Female Readers Percentage',
+(COUNT (case when ['������ 1$'].Sex!='Male' and ['������ 1$'].Sex!='Female' then 1 end)*100/count(Sex)) as 'unspecified Readers Percentage'
+from Portfolio_Data..['����� �����$'] 
+join Portfolio_Data..['������ 1$'] on ['������ 1$'].[Serial Number]=['����� �����$'].[Serial Number] 
+where (['����� �����$'].[Read any printed books during last 12months?] !='NULL' 
+and ['����� �����$'].[Read any e-books during last 12months?]!='NULL'
+and ['����� �����$'].[Read any audiobooks during last 12months?]!='NULL'
+and ['����� �����$'].[Read any printed books during last 12months?] !='No' 
+or ['����� �����$'].[Read any e-books during last 12months?]!='No'
+or ['����� �����$'].[Read any audiobooks during last 12months?]!='No')
+
+--explore data about reading and education
+
+select education, (AVG([How many books did you read during last 12months?])) as "average amount of books"
+from Portfolio_Data..['����� �����$'] 
+join Portfolio_Data..['������ 1$'] on ['������ 1$'].[Serial Number]=['����� �����$'].[Serial Number]
+group by Education order by [average amount of books]
+
+--explore data about reading and age
+
+select Age, (AVG([How many books did you read during last 12months?])) as "average amount of books"
+from Portfolio_Data..['����� �����$'] 
+join Portfolio_Data..['������ 1$'] on ['������ 1$'].[Serial Number]=['����� �����$'].[Serial Number]
+group by Age order by Age
